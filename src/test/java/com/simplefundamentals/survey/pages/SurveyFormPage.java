@@ -1,6 +1,7 @@
 package com.simplefundamentals.survey.pages;
 
 import com.simplefundamentals.survey.locators.SurveyFormLocators;
+import com.simplefundamentals.survey.utils.SurveyRandomizer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -9,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Page Object class representing the Google Form survey page.
@@ -22,6 +24,7 @@ public class SurveyFormPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
     private final SurveyFormLocators locators = new SurveyFormLocators();
+    private final SurveyRandomizer randomizer = new SurveyRandomizer();
 
     public SurveyFormPage(WebDriver driver) {
         this.driver = driver;
@@ -66,9 +69,11 @@ public class SurveyFormPage {
      */
     public void selectAgeGroup() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getAgeGroup_21_23()))).click();
             delay();
-            log("Selected Age Group 21-23");
+            String locator = randomizer.getRandomAgeGroup();
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Age Group randomly: " + locator);
         } catch (Exception e) { throw new RuntimeException("Failed at selectAgeGroup()", e); }
     }
 
@@ -79,35 +84,47 @@ public class SurveyFormPage {
 
     public void selectGender() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getGender_male()))).click();
             delay();
-            log("Selected Gender Male");
+            String locator = randomizer.getRandomGender(); // <-- random selection
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Gender randomly: " + locator);
         } catch (Exception e) { throw new RuntimeException("Failed at selectGender()", e); }
     }
 
     /**
      * Question: "Which faculty are you enrolled in?"
-     * <p>Selects Faculty of Science.</p>
+     * <p>Selects a random faculty option using SurveyRandomizer.</p>
      */
     public void selectFaculty() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getFaculty_science()))).click();
             delay();
-            log("Selected Faculty Science");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectFaculty()", e); }
+            String locator = randomizer.getRandomFaculty(); // <-- random selection
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Faculty randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectFaculty()", e);
+        }
     }
+
 
     /**
      * Question: "Which year of study are you in?"
-     * <p>Selects 3rd Year.</p>
+     * <p>Selects a random year using SurveyRandomizer.</p>
      */
     public void selectYear() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getYear_3rd()))).click();
             delay();
-            log("Selected Year 3rd");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectYear()", e); }
+            String locator = randomizer.getRandomYear(); // <-- random selection
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Year randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectYear()", e);
+        }
     }
+
 
     /**
      * Question: "Do you use TikTok?"
@@ -115,6 +132,7 @@ public class SurveyFormPage {
      */
     public void selectTikTokUsage() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getTiktok_yes()))).click();
             delay();
             log("Selected TikTok Usage Yes");
@@ -123,28 +141,41 @@ public class SurveyFormPage {
 
     /**
      * Question: "How often do you see ads on TikTok?"
-     * <p>Selects Sometimes.</p>
+     * <p>Selects a random frequency using SurveyRandomizer.</p>
      */
     public void selectAdsFrequency() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getAds_sometimes()))).click();
             delay();
-            log("Selected Ads Frequency Sometimes");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectAdsFrequency()", e); }
+            String locator = randomizer.getRandomAdsFrequency(); // random selection
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Ads Frequency randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectAdsFrequency()", e);
+        }
     }
+
 
     /**
      * Question: "What types of content do you consume?"
-     * <p>Selects Viral Challenges and Influencer Reviews.</p>
+     * <p>Selects random content types using SurveyRandomizer (multi-select).</p>
      */
     public void selectContentTypes() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getViral_challenges()))).click();
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getInfluencer_reviews()))).click();
             delay();
-            log("Selected Content Types: Viral Challenges & Influencer Reviews");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectContentTypes()", e); }
+            // Get a random list of content types (could be 1 or many)
+            List<String> selectedLocators = randomizer.getRandomContentTypes();
+
+            for (String locator : selectedLocators) {
+                wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+                delay();
+                log("Selected Content Type: " + locator);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectContentTypes()", e);
+        }
     }
+
 
     /**
      * Question: "Have you ever purchased a product you saw on TikTok?"
@@ -162,28 +193,46 @@ public class SurveyFormPage {
 
     /**
      * Question: "If yes, what product categories have you bought?"
-     * <p>Selects Clothing/Fashion and Beauty/Skincare.</p>
+     * <p>Selects one or more random product options using SurveyRandomizer,
+     * while ignoring the "Other" option to avoid crashes.</p>
      */
     public void selectProductOptions() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getBought_tiktok_clothing_fashion()))).click();
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getBought_tiktok_beauty_skincare()))).click();
             delay();
-            log("Selected Product Options: Clothing & Beauty/Skincare");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectProductOptions()", e); }
+            List<String> selectedLocators = randomizer.getRandomProductOptions();
+
+            // Filter out "Other" option safely
+            selectedLocators.removeIf(locator -> locator.contains("Other") || locator.toLowerCase().contains("other"));
+
+            for (String locator : selectedLocators) {
+                wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+                delay();
+                log("Selected Product Option: " + locator);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectProductOptions()", e);
+        }
     }
+
+
 
     /**
      * Question: "On a scale of 1–5, how convincing are TikTok ads?"
-     * <p>Selects 4.</p>
+     * <p>Selects a random value using SurveyRandomizer.</p>
      */
     public void selectAdConvincingScale() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getTiktok_ad_convincing_4()))).click();
             delay();
-            log("Selected Ad Convincing Scale 4");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectAdConvincingScale()", e); }
+            String locator = randomizer.getRandomAdConvincingScale(); // random 1–5
+
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Ad Convincing Scale randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectAdConvincingScale()", e);
+        }
     }
+
 
     /**
      * Question: "Have you made unplanned purchases influenced by TikTok?"
@@ -191,6 +240,7 @@ public class SurveyFormPage {
      */
     public void selectUnplannedPurchase() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getUnplanned_purchase_yes()))).click();
             delay();
             log("Selected Unplanned Purchase Yes");
@@ -199,16 +249,20 @@ public class SurveyFormPage {
 
     /**
      * Question: "Do you consider your budget when making purchases?"
-     * <p>Selects Sometimes.</p>
+     * <p>Selects a random option using SurveyRandomizer.</p>
      */
     public void selectBudgetConsideration() {
         try {
             delay();
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getBudget_sometimes()))).click();
+            String locator = randomizer.getRandomBudgetConsideration(); // new random method
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
             delay();
-            log("Selected Budget Consideration Sometimes");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectBudgetConsideration()", e); }
+            log("Selected Budget Consideration randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectBudgetConsideration()", e);
+        }
     }
+
 
     /**
      * Question: "Have you been exposed to budgeting content?"
@@ -234,6 +288,7 @@ public class SurveyFormPage {
      */
     public void selectConsumerTips() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getTips_maybe()))).click();
             delay();
             log("Selected Consumer Tips Maybe");
@@ -246,6 +301,7 @@ public class SurveyFormPage {
      */
     public void selectUniversityAwareness() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getUni_not_sure()))).click();
             delay();
             log("Selected University Awareness Not Sure");
@@ -254,15 +310,20 @@ public class SurveyFormPage {
 
     /**
      * Question: "How effective are short-form videos for financial education?"
-     * <p>Selects Somewhat Effective.</p>
+     * <p>Selects a random effectiveness option using SurveyRandomizer.</p>
      */
     public void selectShortFormVideos() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getVideo_somewhat_effective()))).click();
             delay();
-            log("Selected Short Form Videos Somewhat Effective");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectShortFormVideos()", e); }
+            String locator = randomizer.getRandomShortFormVideoEffectiveness(); // new random method
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Short Form Videos randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectShortFormVideos()", e);
+        }
     }
+
 
     /**
      * Question: "Would you like weekly tips from the university?"
@@ -270,6 +331,7 @@ public class SurveyFormPage {
      */
     public void selectWeeklyTips() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getTip_maybe()))).click();
             delay();
             log("Selected Weekly Tips maybe");
@@ -278,84 +340,142 @@ public class SurveyFormPage {
 
     /**
      * Question: "How comfortable are you discussing finances?"
-     * <p>Selects Neutral.</p>
+     * <p>Selects a random comfort level, but never Neutral.</p>
      */
     public void selectComfortLevel() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getComfort_somewhat()))).click();
             delay();
-            log("Selected Comfort Level Neutral");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectComfortLevel()", e); }
+
+            String locator;
+            // keep trying until it's not Neutral
+            do {
+                locator = randomizer.getRandomComfortLevel();
+            } while (locator.toLowerCase().contains("neutral"));
+
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Comfort Level (non-neutral) randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectComfortLevel()", e);
+        }
     }
+
+
 
     /**
      * Question: "How important is digital content for financial education?"
-     * <p>Selects Important.</p>
+     * <p>Selects a random importance option using SurveyRandomizer (excludes Neutral).</p>
      */
     public void selectDigitalImportance() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getImportance_important()))).click();
             delay();
-            log("Selected Digital Importance Important");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectDigitalImportance()", e); }
+
+            String locator;
+            int attempts = 0;
+            do {
+                locator = randomizer.getRandomDigitalImportance();
+                attempts++;
+                // Prevent infinite loop in case all locators are Neutral by mistake
+                if (attempts > 10) {
+                    throw new RuntimeException("Randomizer kept picking Neutral for Digital Importance.");
+                }
+            } while (locator.contains("Neutral"));
+
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Digital Importance randomly (non-neutral): " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectDigitalImportance()", e);
+        }
     }
+
+
 
     /**
      * Question: "To what extent do you agree with the statement [X]?"
-     * <p>Selects Strongly Agree.</p>
+     * <p>Selects a random agreement option, but never Neutral.</p>
      */
     public void selectAgreement() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getAgree_strongly()))).click();
             delay();
-            log("Selected Agreement Strongly");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectAgreement()", e); }
+
+            String locator;
+            // Keep picking until it's not Neutral
+            do {
+                locator = randomizer.getRandomAgreement();
+            } while (locator.toLowerCase().contains("neutral"));
+
+            wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+            delay();
+            log("Selected Agreement (non-neutral) randomly: " + locator);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectAgreement()", e);
+        }
     }
+
 
     /**
      * Question: "What formats do you prefer for learning?"
-     * <p>Selects TikTok .</p>
+     * <p>Selects one or more random formats from SurveyRandomizer.</p>
      */
     public void selectPreferredFormats() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(by(locators.getFormatTikTok()))).click();
-
             delay();
-            log("Selected Preferred Formats: TikTok ");
-        } catch (Exception e) { throw new RuntimeException("Failed at selectPreferredFormats()", e); }
+            // Get a list of 1–all random preferred formats
+            List<String> selectedLocators = randomizer.getRandomPreferredFormats();
+
+            for (String locator : selectedLocators) {
+                wait.until(ExpectedConditions.elementToBeClickable(by(locator))).click();
+                delay();
+                log("Selected Preferred Format: " + locator);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at selectPreferredFormats()", e);
+        }
     }
+
 
     /**
      * Question: "Please explain your preferred communication format."
-     * <p>Fills explanation textarea with sample text.</p>
+     * <p>Fills explanation textarea with random text.</p>
      */
     public void fillExplanation() {
         try {
-            driver.findElement(by(locators.getExplanationTextarea()))
-                    .sendKeys("TikTok is  educational.");
             delay();
-            log("Filled Explanation Textarea");
-        } catch (Exception e) { throw new RuntimeException("Failed at fillExplanation()", e); }
+            String text = randomizer.getRandomExplanation();
+            driver.findElement(by(locators.getExplanationTextarea()))
+                    .sendKeys(text);
+            delay();
+            log("Filled Explanation Textarea with: " + text);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at fillExplanation()", e);
+        }
     }
 
     /**
      * Question: "Any suggestions to improve financial communication?"
-     * <p>Fills suggestion textarea with sample text.</p>
+     * <p>Fills suggestion textarea with random text.</p>
      */
     public void fillSuggestion() {
         try {
-            driver.findElement(by(locators.getSuggestionTextarea()))
-                    .sendKeys("Add more case studies and financial literacy videos and webinars.");
             delay();
-            log("Filled Suggestion Textarea");
-        } catch (Exception e) { throw new RuntimeException("Failed at fillSuggestion()", e); }
+            String text = randomizer.getRandomSuggestion();
+            driver.findElement(by(locators.getSuggestionTextarea()))
+                    .sendKeys(text);
+            delay();
+            log("Filled Suggestion Textarea with: " + text);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed at fillSuggestion()", e);
+        }
     }
+
 
     /**
      * Clicks the final "Submit" button to submit the survey.
      */
     public void submit() {
         try {
+            delay();
             wait.until(ExpectedConditions.elementToBeClickable(by(locators.getSubmit_button()))).click();
             delay();
             log("Submitted Survey Form");

@@ -19,8 +19,15 @@ public class SurveyFormLocators {
     private final String gender_prefer_not =
             "//div[@role='heading' and contains(.,'Gender')]/following::div[@role='radio' and @aria-label='Prefer not to say'][1]";
 
-    private final String faculty_science = "div[aria-label='Science & Agriculture']";
-    private final String faculty_education = "div[aria-label='Education']";
+    // === Faculty Options (Radio Buttons) ===
+    private final String faculty_humanities =
+            "div[aria-label='Humanities & Social Sciences']";
+    private final String faculty_commerce =
+            "div[aria-label='Commerce, Administration & Law']";
+    private final String faculty_science =
+            "div[aria-label='Science & Agriculture']";
+    private final String faculty_education =
+            "div[aria-label='Education']";
     private final String faculty_other =
             "//div[@role='heading' and contains(.,'Faculty')]/following::div[@role='radio' and @aria-label='Other'][1]";
 
@@ -29,7 +36,7 @@ public class SurveyFormLocators {
     private final String year_2nd = "div[aria-label='2nd Year']";
     private final String year_3rd = "div[aria-label='3rd Year']";
     private final String year_4th = "div[aria-label='4th Year']";
-    private final String year_honours = "div[aria-label='Honours/Postgraduate']";
+    private final String year_honours = "div[aria-label='Honours / Postgraduate']";
 
     // === TikTok Usage (Radio Buttons) ===
     private final String tiktok_yes =
@@ -86,9 +93,11 @@ public class SurveyFormLocators {
     private final String budget_sometimes = budget_question + "/following::div[@role='radiogroup'][1]//div[@role='radio' and @aria-label='Sometimes']";
     private final String budget_rarely = budget_question + "/following::div[@role='radiogroup'][1]//div[@role='radio' and @aria-label='Rarely']";
     private final String budget_never = budget_question + "/following::div[@role='radiogroup'][1]//div[@role='radio' and @aria-label='Never']";
+
+
     // === Faculty (Radio Buttons) ===
-    private final String faculty_humanities = "div[aria-label='Humanities & Social Sciences']";
-    private final String faculty_commerce = "div[aria-label='Commerce/Administration/Law']";
+//    private final String faculty_humanities = "div[aria-label='Humanities & Social Sciences']";
+//    private final String faculty_commerce = "div[aria-label='Commerce/Administration/Law']";
     private final String sponsored_content = "div[role='checkbox'][aria-label='Sponsored content from brands']";
     private final String viral_challenges = "div[role='checkbox'][aria-label='Viral challenges like #TikTokMadeMeBuyIt']";
     // === TikTok Advertising Convincing Scale (Radio Buttons) ===

@@ -77,34 +77,66 @@ public class SurveyFormTest {
      * </ol>
      */
     @Test
-    void testSurveySubmission() {
-        formPage.open("https://docs.google.com/forms/d/e/1FAIpQLSfGU49rRQ0-NXGMh6nOHmh6azNPOK3EvFIeVSxG1eWIOjfw6w/viewform");
+    void testSurveyMultipleSubmissions() {
+        int runs = 300;
 
-        formPage.selectAgeGroup();
-        formPage.selectGender();
-        formPage.selectFaculty();
-        formPage.selectYear();
-        formPage.selectTikTokUsage();
-        formPage.selectAdsFrequency();
-        formPage.selectContentTypes();
-        formPage.selectPurchaseDecision();
-        formPage.selectProductOptions();
-        formPage.selectAdConvincingScale();
-        formPage.selectUnplannedPurchase();
-        formPage.selectBudgetConsideration();
-        formPage.selectBudgetingExposure();
-        formPage.selectConsumerTips();
-        formPage.selectUniversityAwareness();
-        formPage.selectShortFormVideos();
-        formPage.selectWeeklyTips();
-        formPage.selectComfortLevel();
-        formPage.selectDigitalImportance();
-        formPage.selectAgreement();
-        formPage.selectPreferredFormats();
-        formPage.fillExplanation();
-        formPage.fillSuggestion();
-        formPage.submit();
+        for (int i = 1; i <= runs; i++) {
+            System.out.println("=== Starting submission " + i + " ===");
 
-        Assertions.assertTrue(formPage.isSubmitted(), "Survey should be submitted successfully");
+            // Create a new browser session
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--disable-gpu", "--window-size=1920,1080");
+            if (Boolean.parseBoolean(System.getProperty("headless", "false"))) {
+                options.addArguments("--headless=new");
+            }
+
+            WebDriver driver = new ChromeDriver(options);
+            SurveyFormPage formPage = new SurveyFormPage(driver);
+
+            try {
+                formPage.open("https://docs.google.com/forms/d/e/1FAIpQLSfGU49rRQ0-NXGMh6nOHmh6azNPOK3EvFIeVSxG1eWIOjfw6w/viewform");
+
+                formPage.selectAgeGroup();
+                formPage.selectGender();
+                formPage.selectFaculty();
+                formPage.selectYear();
+                formPage.selectTikTokUsage();
+                formPage.selectAdsFrequency();
+                formPage.selectContentTypes();
+                formPage.selectPurchaseDecision();
+                formPage.selectProductOptions();
+                formPage.selectAdConvincingScale();
+                formPage.selectUnplannedPurchase();
+                formPage.selectBudgetConsideration();
+                formPage.selectBudgetingExposure();
+                formPage.selectConsumerTips();
+                formPage.selectUniversityAwareness();
+                formPage.selectShortFormVideos();
+                formPage.selectWeeklyTips();
+                formPage.selectComfortLevel();
+                formPage.selectDigitalImportance();
+                formPage.selectAgreement();
+                formPage.selectPreferredFormats();
+                formPage.fillExplanation();
+                formPage.fillSuggestion();
+                formPage.submit();
+
+                Assertions.assertTrue(formPage.isSubmitted(), "Survey should be submitted successfully");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                // Always quit the browser after each submission
+                driver.quit();
+            }
+
+            // Wait 2–4 minutes before the next submission
+            int waitTime = 120_000 + (int)(Math.random() * 120_000);
+            System.out.println("Waiting " + (waitTime / 1000) + " seconds before next submission...");
+            try { Thread.sleep(waitTime); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        }
     }
+
+
 }
+
